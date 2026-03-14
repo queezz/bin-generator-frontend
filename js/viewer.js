@@ -47,7 +47,7 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
 dirLight.position.set(80, 120, 100);
 scene.add(dirLight);
 
-const grid = new THREE.GridHelper(200, 20, 0x444444, 0x444444);
+const grid = new THREE.GridHelper(200, 20, 0x444444, 0xd4ce28);
 grid.rotation.x = Math.PI / 2;
 grid.position.set(0, 0, 0);
 grid.material.opacity = 0.4;
@@ -101,7 +101,7 @@ function placeObjectOnGrid(object) {
  * @param {OrbitControls} controls
  * @param {number} offset
  */
-function fitCameraToObject(camera, object, controls, offset = 0) {
+function fitCameraToObject(camera, object, controls, offset = 1.) {
 
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
@@ -118,9 +118,9 @@ function fitCameraToObject(camera, object, controls, offset = 0) {
 
   // place camera diagonally relative to that center
   camera.position.set(
-    center.x + distance,
-    center.y - distance,
-    center.z + distance
+    center.x + distance ,
+    center.y - distance ,
+    center.z + distance 
   );
 
   camera.lookAt(center);

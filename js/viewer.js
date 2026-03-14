@@ -30,7 +30,16 @@ viewerEl.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.target.set(0, 20, 0);
+controls.dampingFactor = 0.05;
+
+controls.rotateSpeed = 1.2;
+controls.zoomSpeed = 1.2;
+controls.panSpeed = 1.0;
+
+controls.screenSpacePanning = true;
+
+controls.minDistance = 10;
+controls.maxDistance = 2000;
 
 const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
 scene.add(hemi);
@@ -92,19 +101,25 @@ function frameGeometry(geometry) {
   geometry.computeBoundingSphere();
 
   const box = geometry.boundingBox;
-
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-  geometry.translate(-center.x, -box.min.y, -center.z);
-
   const size = new THREE.Vector3();
   box.getSize(size);
 
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const distance = Math.max(120, maxDim * 2.2);
+  const center = new THREE.Vector3();
+  box.getCenter(center);
 
-  camera.position.set(distance, distance * 0.85, distance);
-  controls.target.set(0, size.y * 0.35, 0);
+  geometry.translate(-center.x, -box.min.y, -center.z);
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+
+  const distance = maxDim * 2.5;
+
+  camera.position.set(distance, distance * 0.8, distance);
+  controls.target.set(0, size.y * 0.5, 0);
+
+  camera.near = distance / 100;
+  camera.far = distance * 100;
+
+  camera.updateProjectionMatrix();
   controls.update();
 
   modelInfoEl.textContent = `Size: ${size.x.toFixed(1)} × ${size.z.toFixed(1)} × ${size.y.toFixed(1)} mm`;
@@ -173,6 +188,12 @@ async function generateAndPreview() {
     generateBtn.disabled = false;
   }
 }
+
+renderer.domElement.addEventListener("dblclick", () => {
+  if (currentMesh && currentMesh.geometry) {
+    frameGeometry(currentMesh.geometry);
+  }
+});
 
 generateBtn.addEventListener("click", generateAndPreview);
 

@@ -1,181 +1,181 @@
-(function () {
-  "use strict";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+import { STLLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js";
 
-  const viewerEl = document.getElementById("viewer");
-  const apiBaseEl = document.getElementById("apiBase");
-  const xEl = document.getElementById("x");
-  const yEl = document.getElementById("y");
-  const hEl = document.getElementById("h");
-  const nameEl = document.getElementById("name");
-  const cacheBustEl = document.getElementById("cacheBust");
-  const generateBtn = document.getElementById("generateBtn");
-  const downloadBtn = document.getElementById("downloadBtn");
-  const statusEl = document.getElementById("status");
-  const requestUrlEl = document.getElementById("requestUrl");
-  const modelInfoEl = document.getElementById("modelInfo");
+const viewerEl = document.getElementById("viewer");
+const apiBaseEl = document.getElementById("apiBase");
+const xEl = document.getElementById("x");
+const yEl = document.getElementById("y");
+const hEl = document.getElementById("h");
+const nameEl = document.getElementById("name");
+const cacheBustEl = document.getElementById("cacheBust");
+const generateBtn = document.getElementById("generateBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const statusEl = document.getElementById("status");
+const requestUrlEl = document.getElementById("requestUrl");
+const modelInfoEl = document.getElementById("modelInfo");
 
-  let objectUrl = null;
-  let currentMesh = null;
+let objectUrl = null;
+let currentMesh = null;
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b0d12);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0d12);
 
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
-  camera.position.set(140, 120, 160);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10000);
+camera.position.set(140, 120, 160);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  viewerEl.appendChild(renderer.domElement);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+viewerEl.appendChild(renderer.domElement);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.target.set(0, 20, 0);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 20, 0);
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-  scene.add(hemi);
+const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+scene.add(hemi);
 
-  const dir1 = new THREE.DirectionalLight(0xffffff, 1.1);
-  dir1.position.set(80, 120, 100);
-  scene.add(dir1);
+const dir1 = new THREE.DirectionalLight(0xffffff, 1.1);
+dir1.position.set(80, 120, 100);
+scene.add(dir1);
 
-  const dir2 = new THREE.DirectionalLight(0xffffff, 0.5);
-  dir2.position.set(-80, 40, -60);
-  scene.add(dir2);
+const dir2 = new THREE.DirectionalLight(0xffffff, 0.5);
+dir2.position.set(-80, 40, -60);
+scene.add(dir2);
 
-  const grid = new THREE.GridHelper(300, 30, 0x3a4455, 0x252c38);
-  scene.add(grid);
+const grid = new THREE.GridHelper(300, 30, 0x3a4455, 0x252c38);
+scene.add(grid);
 
-  const axes = new THREE.AxesHelper(60);
-  scene.add(axes);
+const axes = new THREE.AxesHelper(60);
+scene.add(axes);
 
-  const loader = new THREE.STLLoader();
+const loader = new STLLoader();
 
-  function setStatus(text, level) {
-    if (level === undefined) level = "";
-    statusEl.textContent = text;
-    statusEl.className = "status";
-    if (level) statusEl.classList.add(level);
+function setStatus(text, level) {
+  if (level === undefined) level = "";
+  statusEl.textContent = text;
+  statusEl.className = "status";
+  if (level) statusEl.classList.add(level);
+}
+
+function resize() {
+  const width = viewerEl.clientWidth || 800;
+  const height = viewerEl.clientHeight || 500;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height, false);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+function buildUrl() {
+  const base = apiBaseEl.value.trim().replace(/\/+$/, "");
+  const url = new URL(base + "/generate");
+  url.searchParams.set("x", xEl.value);
+  url.searchParams.set("y", yEl.value);
+  url.searchParams.set("h", hEl.value);
+  if (nameEl.checked) {
+    url.searchParams.set("name", "true");
+  }
+  if (cacheBustEl.checked) {
+    url.searchParams.set("_t", Date.now().toString());
+  }
+  return url;
+}
+
+function frameGeometry(geometry) {
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+
+  const box = geometry.boundingBox;
+
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+  geometry.translate(-center.x, -box.min.y, -center.z);
+
+  const size = new THREE.Vector3();
+  box.getSize(size);
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const distance = Math.max(120, maxDim * 2.2);
+
+  camera.position.set(distance, distance * 0.85, distance);
+  controls.target.set(0, size.y * 0.35, 0);
+  controls.update();
+
+  modelInfoEl.textContent = `Size: ${size.x.toFixed(1)} × ${size.z.toFixed(1)} × ${size.y.toFixed(1)} mm`;
+}
+
+function showGeometry(geometry) {
+  if (currentMesh) {
+    scene.remove(currentMesh);
+    currentMesh.geometry.dispose();
+    currentMesh.material.dispose();
+    currentMesh = null;
   }
 
-  function resize() {
-    const width = viewerEl.clientWidth || 800;
-    const height = viewerEl.clientHeight || 500;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height, false);
-  }
+  geometry.computeVertexNormals();
 
-  function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-  }
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x8cb7ff,
+    metalness: 0.08,
+    roughness: 0.55
+  });
 
-  function buildUrl() {
-    const base = apiBaseEl.value.trim().replace(/\/+$/, "");
-    const url = new URL(base + "/generate");
-    url.searchParams.set("x", xEl.value);
-    url.searchParams.set("y", yEl.value);
-    url.searchParams.set("h", hEl.value);
-    if (nameEl.checked) {
-      url.searchParams.set("name", "true");
+  currentMesh = new THREE.Mesh(geometry, material);
+  currentMesh.castShadow = false;
+  currentMesh.receiveShadow = false;
+  scene.add(currentMesh);
+
+  frameGeometry(geometry);
+}
+
+async function generateAndPreview() {
+  generateBtn.disabled = true;
+  downloadBtn.classList.add("disabled");
+  setStatus("Generating STL...", "warn");
+
+  try {
+    const url = buildUrl();
+    requestUrlEl.textContent = url.toString();
+
+    const response = await fetch(url.toString(), { method: "GET" });
+    if (!response.ok) {
+      throw new Error("HTTP " + response.status);
     }
-    if (cacheBustEl.checked) {
-      url.searchParams.set("_t", Date.now().toString());
+
+    const blob = await response.blob();
+
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
     }
-    return url;
+    objectUrl = URL.createObjectURL(blob);
+
+    const arrayBuffer = await blob.arrayBuffer();
+    const geometry = loader.parse(arrayBuffer);
+    showGeometry(geometry);
+
+    downloadBtn.href = objectUrl;
+    downloadBtn.download = nameEl.checked
+      ? "bin-" + xEl.value + "-" + yEl.value + "-" + hEl.value + ".stl"
+      : "bin.stl";
+    downloadBtn.classList.remove("disabled");
+
+    setStatus("Model loaded.", "ok");
+  } catch (error) {
+    console.error(error);
+    setStatus("Failed to load STL. If the API works in browser but not here, enable CORS on the backend.", "error");
+  } finally {
+    generateBtn.disabled = false;
   }
+}
 
-  function frameGeometry(geometry) {
-    geometry.computeBoundingBox();
-    geometry.computeBoundingSphere();
+generateBtn.addEventListener("click", generateAndPreview);
 
-    const box = geometry.boundingBox;
-
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    geometry.translate(-center.x, -box.min.y, -center.z);
-
-    const size = new THREE.Vector3();
-    box.getSize(size);
-
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const distance = Math.max(120, maxDim * 2.2);
-
-    camera.position.set(distance, distance * 0.85, distance);
-    controls.target.set(0, size.y * 0.35, 0);
-    controls.update();
-
-    modelInfoEl.textContent = `Size: ${size.x.toFixed(1)} × ${size.z.toFixed(1)} × ${size.y.toFixed(1)} mm`;
-  }
-
-  function showGeometry(geometry) {
-    if (currentMesh) {
-      scene.remove(currentMesh);
-      currentMesh.geometry.dispose();
-      currentMesh.material.dispose();
-      currentMesh = null;
-    }
-
-    geometry.computeVertexNormals();
-
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x8cb7ff,
-      metalness: 0.08,
-      roughness: 0.55
-    });
-
-    currentMesh = new THREE.Mesh(geometry, material);
-    currentMesh.castShadow = false;
-    currentMesh.receiveShadow = false;
-    scene.add(currentMesh);
-
-    frameGeometry(geometry);
-  }
-
-  async function generateAndPreview() {
-    generateBtn.disabled = true;
-    downloadBtn.classList.add("disabled");
-    setStatus("Generating STL...", "warn");
-
-    try {
-      const url = buildUrl();
-      requestUrlEl.textContent = url.toString();
-
-      const response = await fetch(url.toString(), { method: "GET" });
-      if (!response.ok) {
-        throw new Error("HTTP " + response.status);
-      }
-
-      const blob = await response.blob();
-
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-      objectUrl = URL.createObjectURL(blob);
-
-      const arrayBuffer = await blob.arrayBuffer();
-      const geometry = loader.parse(arrayBuffer);
-      showGeometry(geometry);
-
-      downloadBtn.href = objectUrl;
-      downloadBtn.download = nameEl.checked
-        ? "bin-" + xEl.value + "-" + yEl.value + "-" + hEl.value + ".stl"
-        : "bin.stl";
-      downloadBtn.classList.remove("disabled");
-
-      setStatus("Model loaded.", "ok");
-    } catch (error) {
-      console.error(error);
-      setStatus("Failed to load STL. If the API works in browser but not here, enable CORS on the backend.", "error");
-    } finally {
-      generateBtn.disabled = false;
-    }
-  }
-
-  generateBtn.addEventListener("click", generateAndPreview);
-
-  window.addEventListener("resize", resize);
-  resize();
-  animate();
-})();
+window.addEventListener("resize", resize);
+resize();
+animate();

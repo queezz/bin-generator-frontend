@@ -35,9 +35,10 @@ viewerEl.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
+controls.screenSpacePanning = true;
 controls.maxPolarAngle = Math.PI / 2;
 controls.minDistance = 10;
-controls.maxDistance = 2000;
+controls.maxDistance = 1000;
 controls.target.copy(defaultControlsTarget);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
@@ -45,8 +46,12 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
 dirLight.position.set(80, 120, 100);
 scene.add(dirLight);
 
-const grid = new THREE.GridHelper(200, 20, 0x3a4455, 0x252c38);
+const grid = new THREE.GridHelper(200, 20, 0x444444, 0x444444);
+grid.position.set(0, 0, 0);
 scene.add(grid);
+
+const axesHelper = new THREE.AxesHelper(50);
+scene.add(axesHelper);
 
 const loader = new STLLoader();
 
@@ -72,47 +77,39 @@ function animate() {
 }
 
 /**
- * Centers the camera and controls so the object fills the viewport.
+ * Centers the object at the origin using its bounding box.
+ * @param {THREE.Object3D} object
+ */
+function centerObject(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const center = box.getCenter(new THREE.Vector3());
+  object.position.sub(center);
+}
+
+/**
+ * Moves the camera to frame the object using its bounding box and camera FOV.
  * @param {THREE.PerspectiveCamera} camera
  * @param {THREE.Object3D} object
  * @param {OrbitControls} controls
+ * @param {number} offset
  */
-function fitCameraToObject(camera, object, controls) {
+function fitCameraToObject(camera, object, controls, offset = 1.25) {
   const box = new THREE.Box3().setFromObject(object);
-  const size = new THREE.Vector3();
-  const center = new THREE.Vector3();
-  box.getSize(size);
-  box.getCenter(center);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
 
   const maxDim = Math.max(size.x, size.y, size.z);
-  const distance = Math.max(maxDim * 2.5, 50);
+  const fov = camera.fov * (Math.PI / 180);
+  let cameraZ = Math.abs(maxDim / Math.tan(fov / 2));
+  cameraZ *= offset;
 
-  camera.position.set(center.x + distance * 0.7, center.y + distance * 0.7, center.z + distance * 0.7);
-  controls.target.copy(center);
-  camera.near = distance / 100;
-  camera.far = distance * 100;
-  camera.updateProjectionMatrix();
-  controls.update();
-}
+  camera.position.set(center.x, center.y + cameraZ * 0.2, center.z + cameraZ);
+  camera.lookAt(center);
 
-function frameGeometry(geometry) {
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-
-  const box = geometry.boundingBox;
-  const size = new THREE.Vector3();
-  box.getSize(size);
-
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-
-  geometry.translate(-center.x, -box.min.y, -center.z);
-
-  if (currentMesh) {
-    fitCameraToObject(camera, currentMesh, controls);
+  if (controls) {
+    controls.target.copy(center);
+    controls.update();
   }
-
-  modelInfoEl.textContent = `Size: ${size.x.toFixed(1)} × ${size.z.toFixed(1)} × ${size.y.toFixed(1)} mm`;
 }
 
 function showGeometry(geometry) {
@@ -126,26 +123,38 @@ function showGeometry(geometry) {
   geometry.computeVertexNormals();
 
   const material = new THREE.MeshStandardMaterial({
-    color: 0x8cb7ff,
-    metalness: 0.08,
-    roughness: 0.55
+    color: 0x8aa4d6,
+    metalness: 0.1,
+    roughness: 0.6
   });
 
   currentMesh = new THREE.Mesh(geometry, material);
+  currentMesh.rotation.x = -Math.PI / 2; // CAD Z-up -> Three.js Y-up
   currentMesh.castShadow = false;
   currentMesh.receiveShadow = false;
   scene.add(currentMesh);
 
-  frameGeometry(geometry);
+  centerObject(currentMesh);
+
+  const box = new THREE.Box3().setFromObject(currentMesh);
+  const size = box.getSize(new THREE.Vector3());
+  modelInfoEl.textContent = `Size: ${size.x.toFixed(1)} × ${size.y.toFixed(1)} × ${size.z.toFixed(1)} mm`;
+
+  fitCameraToObject(camera, currentMesh, controls, 1.25);
+  fitViewBtn.classList.add("hidden");
 }
 
 function resetView() {
-  controls.target.copy(defaultControlsTarget);
-  camera.position.copy(defaultCameraPosition);
-  camera.near = 0.1;
-  camera.far = 10000;
-  camera.updateProjectionMatrix();
-  controls.update();
+  if (currentMesh) {
+    fitCameraToObject(camera, currentMesh, controls);
+  } else {
+    controls.target.copy(defaultControlsTarget);
+    camera.position.copy(defaultCameraPosition);
+    camera.near = 0.1;
+    camera.far = 10000;
+    camera.updateProjectionMatrix();
+    controls.update();
+  }
 }
 
 async function generateAndPreview() {
@@ -188,8 +197,19 @@ async function generateAndPreview() {
 }
 
 renderer.domElement.addEventListener("dblclick", () => {
-  if (currentMesh && currentMesh.geometry) {
-    frameGeometry(currentMesh.geometry);
+  if (currentMesh) {
+    fitCameraToObject(camera, currentMesh, controls);
+  }
+});
+
+const fitViewBtn = document.getElementById("fitViewBtn");
+controls.addEventListener("change", () => {
+  if (currentMesh) fitViewBtn.classList.remove("hidden");
+});
+fitViewBtn.addEventListener("click", () => {
+  if (currentMesh) {
+    fitCameraToObject(camera, currentMesh, controls);
+    fitViewBtn.classList.add("hidden");
   }
 });
 

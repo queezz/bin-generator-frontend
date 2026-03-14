@@ -125,10 +125,34 @@ button:disabled, a.button-link.disabled {
 }
 
 .viewer-container {
+  position: relative;
   margin-bottom: 20px;
 }
 
+.fit-view {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #2a2f3a;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  z-index: 10;
+}
+
+.fit-view:hover {
+  background: #353b48;
+}
+
+.hidden {
+  display: none;
+}
+
 .viewer {
+  position: relative;
   width: 100%;
   max-width: 900px;
   height: 500px;

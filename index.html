@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bin Generator</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <h1>Bin Generator</h1>
+      <p class="lead">Generate an STL from your Cloud Run backend and preview it directly in the browser.</p>
+
+      <div class="field">
+        <label for="apiBase">Backend URL</label>
+        <input id="apiBase" type="text" value="https://bin-generator-540296082924.asia-northeast1.run.app" />
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="x">X (mm)</label>
+          <input id="x" type="number" step="1" min="1" value="50" />
+        </div>
+        <div class="field">
+          <label for="y">Y (mm)</label>
+          <input id="y" type="number" step="1" min="1" value="100" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="h">Height (mm)</label>
+        <input id="h" type="number" step="1" min="1" value="30" />
+      </div>
+
+      <div class="checks">
+        <label class="check">
+          <input id="name" type="checkbox" checked />
+          <span>Named STL file</span>
+        </label>
+
+        <label class="check">
+          <input id="cacheBust" type="checkbox" checked />
+          <span>Avoid stale cached responses</span>
+        </label>
+      </div>
+
+      <div class="btn-row">
+        <button id="generateBtn" class="primary">Generate + Preview</button>
+        <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">Download STL</a>
+      </div>
+
+      <div id="status" class="status">Ready.</div>
+      <div id="requestUrl" class="url-box">Request URL will appear here.</div>
+
+      <div class="hint">
+        Later you can extend the form with flags like <span class="pill">no lip</span>,
+        <span class="pill">no ears</span>, wall thickness, radii, and so on.
+      </div>
+    </aside>
+
+    <main class="viewer-wrap">
+      <div class="viewer-header">
+        <span>Mouse: rotate · wheel: zoom · right-drag: pan</span>
+        <span id="modelInfo">No model loaded</span>
+      </div>
+      <div id="viewer"></div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="js/viewer.js"></script>
+</body>
+</html>

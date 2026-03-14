@@ -35,11 +35,11 @@ viewerEl.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
+controls.dampingFactor = 0.2;
 controls.screenSpacePanning = true;
 controls.maxPolarAngle = Math.PI * 0.95; 
-controls.minDistance = 10;
-controls.maxDistance = 1000;
+controls.minDistance = 30;
+controls.maxDistance = 300;
 controls.target.copy(defaultControlsTarget);
 
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
@@ -71,7 +71,7 @@ function resize() {
   const height = viewerEl.clientHeight || 500;
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setSize(width, height, false);
+  renderer.setSize(width, height);
 }
 
 function animate() {
@@ -101,7 +101,7 @@ function placeObjectOnGrid(object) {
  * @param {OrbitControls} controls
  * @param {number} offset
  */
-function fitCameraToObject(camera, object, controls, offset = 1.) {
+function fitCameraToObject(camera, object, controls, offset = 0) {
 
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
@@ -122,6 +122,9 @@ function fitCameraToObject(camera, object, controls, offset = 1.) {
     center.y - distance ,
     center.z + distance 
   );
+
+  const direction = new THREE.Vector3(1, -1, 1).normalize();
+  camera.position.copy(center).add(direction.multiplyScalar(distance));
 
   camera.lookAt(center);
 
@@ -165,8 +168,8 @@ function resetView() {
   } else {
     controls.target.copy(defaultControlsTarget);
     camera.position.copy(defaultCameraPosition);
-    camera.near = 0.1;
-    camera.far = 10000;
+    camera.near = 10;
+    camera.far = 1000;
     camera.updateProjectionMatrix();
     controls.update();
   }
@@ -195,7 +198,7 @@ async function generateAndPreview() {
     const arrayBuffer = await blob.arrayBuffer();
     const geometry = loader.parse(arrayBuffer);
     showGeometry(geometry);
-
+    
     downloadBtn.href = objectUrl;
     downloadBtn.download = nameEl.checked
       ? "bin-" + xEl.value + "-" + yEl.value + "-" + hEl.value + ".stl"

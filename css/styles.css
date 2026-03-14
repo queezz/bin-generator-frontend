@@ -21,21 +21,25 @@ body {
 }
 
 .app {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
 }
 
 .sidebar {
+  width: 320px;
+  flex-shrink: 0;
   padding: 20px;
   border-right: 1px solid var(--border);
   background: var(--panel);
 }
 
 .viewer-wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  max-height: 900px;
   background: #0b0d12;
 }
 
@@ -51,8 +55,10 @@ body {
 }
 
 #viewer {
-  flex: 1;
-  min-height: 60vh;
+  width: 100%;
+  height: 600px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 h1 {
@@ -185,7 +191,6 @@ button:disabled, a.button-link.disabled {
 }
 
 @media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
+  .app { flex-direction: column; }
   .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-  #viewer { min-height: 50vh; }
 }

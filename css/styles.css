@@ -50,33 +50,59 @@ body {
   background: var(--panel);
 }
 
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
+.dimensions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
   margin-bottom: 12px;
+  align-items: center;
 }
 
 .field {
-  margin-bottom: 12px;
+  margin-bottom: 0;
+}
+
+.field-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-inline label {
+  display: inline;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .field label {
-  display: block;
   margin-bottom: 6px;
   color: var(--muted);
   font-size: 14px;
 }
 
+.field:not(.field-inline) label {
+  display: block;
+}
+
 input[type="number"],
 input[type="text"] {
-  width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--panel-2);
   color: var(--text);
   font-size: 15px;
+}
+
+.field-inline input[type="number"] {
+  width: 4.5em;
+  min-width: 56px;
+}
+
+input[type="text"] {
+  width: 100%;
 }
 
 .controls-actions {

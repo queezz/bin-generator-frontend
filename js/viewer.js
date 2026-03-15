@@ -70,6 +70,66 @@ scene.add(grid);
 
 const loader = new STLLoader();
 
+const STORAGE_KEYS = {
+  x: "bin-generator-x",
+  y: "bin-generator-y",
+  h: "bin-generator-h",
+  stl: "bin-generator-stl",
+};
+
+function saveDimensions(x, y, h) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.x, String(x));
+    localStorage.setItem(STORAGE_KEYS.y, String(y));
+    localStorage.setItem(STORAGE_KEYS.h, String(h));
+  } catch (e) {
+    console.warn("Failed to save dimensions to localStorage", e);
+  }
+}
+
+function loadDimensions() {
+  const x = localStorage.getItem(STORAGE_KEYS.x);
+  const y = localStorage.getItem(STORAGE_KEYS.y);
+  const h = localStorage.getItem(STORAGE_KEYS.h);
+  if (x == null || y == null || h == null) return null;
+  return { x, y, h };
+}
+
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+function saveStl(arrayBuffer) {
+  try {
+    const base64 = arrayBufferToBase64(arrayBuffer);
+    localStorage.setItem(STORAGE_KEYS.stl, base64);
+  } catch (e) {
+    if (e.name === "QuotaExceededError") console.warn("localStorage full, STL not saved");
+    else console.warn("Failed to save STL to localStorage", e);
+  }
+}
+
+function loadStl() {
+  const base64 = localStorage.getItem(STORAGE_KEYS.stl);
+  if (!base64) return null;
+  try {
+    return base64ToArrayBuffer(base64);
+  } catch (e) {
+    console.warn("Failed to load STL from localStorage", e);
+    return null;
+  }
+}
+
 function setStatus(text, level) {
   if (level === undefined) level = "";
   statusEl.textContent = text;
@@ -223,6 +283,9 @@ async function generateAndPreview() {
       "bin-" + xEl.value + "-" + yEl.value + "-" + hEl.value + ".stl";
     downloadBtn.classList.remove("disabled");
 
+    saveDimensions(xEl.value, yEl.value, hEl.value);
+    saveStl(arrayBuffer);
+
     setStatus("Model loaded.", "ok");
   } catch (error) {
     console.error(error);
@@ -249,9 +312,40 @@ fitViewBtn.addEventListener("click", () => {
   }
 });
 
+function restoreFromStorage() {
+  const dims = loadDimensions();
+  if (dims) {
+    xEl.value = dims.x;
+    yEl.value = dims.y;
+    hEl.value = dims.h;
+  }
+
+  const stlBuffer = loadStl();
+  if (stlBuffer) {
+    try {
+      const geometry = loader.parse(stlBuffer);
+      showGeometry(geometry);
+      const blob = new Blob([stlBuffer], { type: "application/octet-stream" });
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = URL.createObjectURL(blob);
+      downloadBtn.href = objectUrl;
+      downloadBtn.download =
+        "bin-" + xEl.value + "-" + yEl.value + "-" + hEl.value + ".stl";
+      downloadBtn.classList.remove("disabled");
+      setStatus("Model loaded.", "ok");
+      requestAnimationFrame(() => {
+        if (currentMesh) fitCameraToObject(camera, currentMesh, controls);
+      });
+    } catch (e) {
+      console.warn("Failed to restore STL from localStorage", e);
+    }
+  }
+}
+
 generateBtn.addEventListener("click", generateAndPreview);
 resetViewBtn.addEventListener("click", resetView);
 
+restoreFromStorage();
 window.addEventListener("resize", resize);
 resize();
 animate();

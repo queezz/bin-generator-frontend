@@ -27,7 +27,8 @@
       <div class="controls-actions">
         <div class="btn-row">
           <button id="generateBtn" class="primary">Generate</button>
-          <button id="resetViewBtn" type="button">Reset View</button>
+          <button id="resetViewBtn" type="button" class="hidden">Reset View</button>
+          <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">Download STL</a>
         </div>
         <div id="status" class="status status-inline">Ready.</div>
       </div>
@@ -40,10 +41,6 @@
       <!-- <div class="viewer-hint">Mouse: rotate · Wheel: zoom · Right-drag: pan · Double-click: fit</div> -->
       <div id="modelInfo" class="model-info">No model loaded</div>
     </div>
-
-    <section class="download-section">
-      <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">Download STL</a>
-    </section>
 
   </div>
 

@@ -101,9 +101,9 @@ input[type="text"] {
 
 .controls-actions {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .btn-row {
@@ -186,10 +186,6 @@ button:disabled, a.button-link.disabled {
   color: var(--muted);
 }
 
-.download-section {
-  margin-bottom: 16px;
-}
-
 .status {
   min-height: 22px;
   font-size: 14px;
@@ -197,8 +193,7 @@ button:disabled, a.button-link.disabled {
 }
 
 .status-inline {
-  flex: 1;
-  min-width: 140px;
+  min-height: 22px;
 }
 
 .status.ok { color: var(--ok); }

@@ -205,6 +205,12 @@ button:disabled, a.button-link.disabled {
   overflow: hidden;
 }
 
+.viewer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
 .viewer-hint {
   font-size: 12px;
   color: var(--muted);
@@ -233,5 +239,13 @@ button:disabled, a.button-link.disabled {
 @media (max-width: 640px) {
   .dimensions-row {
     gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .viewer {
+    aspect-ratio: 1 / 1;
+    height: auto;
+    max-height: none;
   }
 }

@@ -108,14 +108,23 @@ function placeObjectOnGrid(object) {
   object.position.z -= box.min.z;
 }
 
+const FIT_OFFSET_MOBILE = 1;
+const FIT_OFFSET_DESKTOP = 0.6;
+const MOBILE_BREAKPOINT = 640;
+
+function getFitOffset() {
+  return window.innerWidth <= MOBILE_BREAKPOINT ? FIT_OFFSET_MOBILE : FIT_OFFSET_DESKTOP;
+}
+
 /**
  * Moves the camera to frame the object using its bounding box and camera FOV.
  * @param {THREE.PerspectiveCamera} camera
  * @param {THREE.Object3D} object
  * @param {OrbitControls} controls
- * @param {number} offset
+ * @param {number} [offset] - Zoom offset; uses 1 on mobile, 0.6 on desktop if omitted.
  */
-function fitCameraToObject(camera, object, controls, offset = 0.6) {
+function fitCameraToObject(camera, object, controls, offset) {
+  const zoomOffset = offset !== undefined ? offset : getFitOffset();
 
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
@@ -125,7 +134,7 @@ function fitCameraToObject(camera, object, controls, offset = 0.6) {
 
   const fov = camera.fov * (Math.PI / 180);
   let distance = Math.abs(maxDim / Math.tan(fov / 2));
-  distance *= offset;
+  distance *= zoomOffset;
 
   // set orbit center
   controls.target.copy(center);

@@ -30,7 +30,9 @@
         <div class="btn-row">
           <button id="generateBtn" class="primary">Generate</button>
           <button id="resetViewBtn" type="button" class="hidden">Reset View</button>
-          <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">Download STL</a>
+          <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">
+            <i data-lucide="cloud-download"></i>
+          </a>
         </div>
         <div id="status" class="status status-inline">Ready.</div>
       </div>
@@ -54,5 +56,8 @@
   }
   </script>
   <script type="module" src="js/viewer.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+<!-- Lucide Icons -->
+<script> lucide.createIcons(); </script>
 </body>
 </html>

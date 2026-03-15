@@ -67,10 +67,6 @@ body {
   align-items: center;
 }
 
-.dimensions-row:not(:last-child) {
-  margin-bottom: 8px;
-}
-
 .dimensions-row label {
   display: inline-flex;
   align-items: center;

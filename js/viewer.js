@@ -342,6 +342,15 @@ function restoreFromStorage() {
   }
 }
 
+document.querySelectorAll(".tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    const tool = tab.dataset.tool;
+    console.log("Selected tool:", tool);
+  });
+});
+
 generateBtn.addEventListener("click", generateAndPreview);
 resetViewBtn.addEventListener("click", resetView);
 

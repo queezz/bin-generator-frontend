@@ -8,16 +8,18 @@
 </head>
 <body>
   <div class="app">
-    <header class="header">
-      <h1>Bin Generator</h1>
-      <p class="lead">Parametric STL generator. Enter dimensions, generate, then preview or download.</p>
+    <header class="toolbar">
+      <div class="tabs">
+        <button class="tab active" type="button" data-tool="bin">📦 Bin</button>
+        <button class="tab" type="button" data-tool="connectors" disabled>🔗 Connectors</button>
+        <!-- <button class="tab" type="button" data-tool="grid">▦ Grid</button> -->
+      </div>
+      <div class="units">Dimensions (mm)</div>
     </header>
 
     <section class="controls">
       <input id="apiBase" type="hidden" />
       <div class="dimensions">
-        <div class="dimensions-label">Dimensions (mm)</div>
-
         <div class="dimensions-row">
           <label>X <input id="x" type="number" step="1" min="1" value="50" /></label>
           <label>Y <input id="y" type="number" step="1" min="1" value="100" /></label>

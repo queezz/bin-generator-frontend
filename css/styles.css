@@ -26,13 +26,43 @@ body {
   padding: 20px;
 }
 
-.header {
-  margin-bottom: 20px;
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.header h1 {
-  margin: 0 0 8px;
-  font-size: 24px;
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #2c3440;
+  background: #161b22;
+  color: #c9d1d9;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: #1f2630;
+}
+
+.tab.active {
+  background: #2f81f7;
+  border-color: #2f81f7;
+  color: white;
+}
+
+.units {
+  font-size: 13px;
+  color: #8b949e;
 }
 
 .lead {

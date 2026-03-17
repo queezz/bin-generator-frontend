@@ -24,6 +24,7 @@ const xEl = document.getElementById("x");
 const yEl = document.getElementById("y");
 const hEl = document.getElementById("h");
 const earsEl = document.getElementById("ears");
+const useRampEl = document.getElementById("useRamp");
 const generateBtn = document.getElementById("generateBtn");
 const resetViewBtn = document.getElementById("resetViewBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -298,7 +299,7 @@ async function generateAndPreview() {
   const y = yEl.value;
   const h = hEl.value;
   const ears = earsEl.checked;
-  const useRamp = true;
+  const useRamp = useRampEl?.checked ?? true;
   const cacheKey = `bin-${x}-${y}-${h}-ears${ears}-ramp${useRamp}`;
 
   try {

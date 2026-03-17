@@ -82,6 +82,10 @@ body {
 
 .dimensions {
   margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
 }
 
 .dimensions-label {
@@ -95,6 +99,21 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  flex: 1 1 100%;
+}
+
+.field.checkbox {
+  display: inline-flex;
+  align-items: center;
+}
+
+.field.checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .dimensions-row label {

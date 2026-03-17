@@ -298,7 +298,8 @@ async function generateAndPreview() {
   const y = yEl.value;
   const h = hEl.value;
   const ears = earsEl.checked;
-  const cacheKey = `bin-${x}-${y}-${h}-ears${ears}`;
+  const useRamp = true;
+  const cacheKey = `bin-${x}-${y}-${h}-ears${ears}-ramp${useRamp}`;
 
   try {
     const cached = await getCached(cacheKey);
@@ -312,7 +313,18 @@ async function generateAndPreview() {
         if (currentMesh) fitCameraToObject(camera, currentMesh, controls);
       });
       downloadBtn.href = objectUrl;
-      downloadBtn.download = "bin-" + x + "-" + y + "-" + h + "-ears" + (ears ? "1" : "0") + ".stl";
+      downloadBtn.download =
+        "bin-" +
+        x +
+        "-" +
+        y +
+        "-" +
+        h +
+        "-ears" +
+        (ears ? "1" : "0") +
+        "-ramp" +
+        (useRamp ? "1" : "0") +
+        ".stl";
       downloadBtn.classList.remove("disabled");
       saveDimensions(x, y, h);
       saveStl(arrayBuffer);
@@ -321,7 +333,7 @@ async function generateAndPreview() {
       return;
     }
 
-    const blob = await generateBin(baseUrl, x, y, h, ears);
+    const blob = await generateBin(baseUrl, x, y, h, ears, useRamp);
     await setCached(cacheKey, blob);
 
     if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -337,7 +349,17 @@ async function generateAndPreview() {
 
     downloadBtn.href = objectUrl;
     downloadBtn.download =
-      "bin-" + x + "-" + y + "-" + h + "-ears" + (ears ? "1" : "0") + ".stl";
+      "bin-" +
+      x +
+      "-" +
+      y +
+      "-" +
+      h +
+      "-ears" +
+      (ears ? "1" : "0") +
+      "-ramp" +
+      (useRamp ? "1" : "0") +
+      ".stl";
     downloadBtn.classList.remove("disabled");
 
     saveDimensions(x, y, h);

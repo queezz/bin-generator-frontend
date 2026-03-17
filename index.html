@@ -45,10 +45,6 @@
         <div class="btn-row">
           <button id="generateBtn" class="primary">Generate</button>
           <button id="resetViewBtn" type="button" class="hidden">Reset View</button>
-          <a id="downloadBtn" class="button-link disabled" href="#" download="bin.stl">
-            <!-- <i data-lucide="cloud-download"></i> STL -->
-             Download
-          </a>
         </div>
         <div id="status" class="status status-inline">Ready.</div>
       </div>
@@ -56,7 +52,8 @@
 
     <div class="viewer-container">
       <div id="viewer" class="viewer">
-        <button id="fitViewBtn" type="button" class="fit-view hidden">Fit to view</button>
+        <a id="downloadBtn" class="viewer-overlay-btn download-view button-link disabled" href="#" download="bin.stl">Download</a>
+        <button id="fitViewBtn" type="button" class="viewer-overlay-btn fit-view hidden">Fit to view</button>
       </div>
       <!-- <div class="viewer-hint">Mouse: rotate · Wheel: zoom · Right-drag: pan · Double-click: fit</div> -->
       <div id="modelInfo" class="model-info">No model loaded</div>

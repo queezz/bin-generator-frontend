@@ -171,22 +171,37 @@ button:disabled, a.button-link.disabled {
   margin-bottom: 20px;
 }
 
-.fit-view {
+.viewer-overlay-btn {
   position: absolute;
-  bottom: 20px;
-  right: 20px;
   padding: 8px 14px;
   border-radius: 6px;
   background: #2a2f3a;
   color: white;
-  border: none;
-  cursor: pointer;
   font-size: 13px;
   z-index: 10;
+  text-decoration: none;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
 }
 
-.fit-view:hover {
+.viewer-overlay-btn:hover {
   background: #353b48;
+}
+
+.viewer-overlay-btn.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.download-view {
+  top: 20px;
+  left: 20px;
+}
+
+.fit-view {
+  bottom: 20px;
+  right: 20px;
 }
 
 .hidden {
@@ -276,7 +291,7 @@ button:disabled, a.button-link.disabled {
     font-size: 16px;
   }
 
-  .fit-view {
+  .viewer-overlay-btn {
     padding: 10px 18px;
     font-size: 14px;
   }

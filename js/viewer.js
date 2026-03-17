@@ -88,7 +88,7 @@ fill2.position.set(-1, 2,-1);
 scene.add(fill2);
 
 
-const grid = new THREE.GridHelper(200, 20, 0xb00e5c, 0xd4ce28);
+const grid = new THREE.GridHelper(200, 20, 0xfff5d6, 0xd4ce28);
 grid.rotation.x = Math.PI / 2;
 grid.position.set(0, 0, 0);
 grid.material.opacity = 0.4;

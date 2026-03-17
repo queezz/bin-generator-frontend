@@ -1,6 +1,6 @@
 :root {
   --bg: #0f1115;
-  --panel: #171a21;
+  --panel: #262f42;
   --panel-2: #1f2430;
   --text: #e8ecf1;
   --muted: #aab4c0;
@@ -55,8 +55,8 @@ body {
 }
 
 .tab.active {
-  background: #2f81f7;
-  border-color: #2f81f7;
+  background: #3976a9;
+  border-color: #326b9a;
   color: white;
 }
 

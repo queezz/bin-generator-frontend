@@ -31,4 +31,4 @@ Some managed networks (e.g. universities, corporate Wi-Fi) may block the site or
 
 If you see “connection is not private” or the site is blocked:
 - try a different network (mobile hotspot, home Wi-Fi)
-- or use GitHub pages directly: https://github.com/queezz/bin
+- or use GitHub pages directly: https://queezz.github.io/bin/

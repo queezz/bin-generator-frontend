@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to use Beanbins</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <div class="app">
+    <header class="toolbar">
+      <div class="tabs">
+        <a class="tab" href="/">🫘 Bin</a>
+        <button class="tab active" type="button">How to</button>
+      </div>
+    </header>
+
+    <main class="howto-content">
+      <h1>How to use Beanbins</h1>
+
+      <ol class="howto-steps">
+        <li><strong>Set dimensions</strong> — Enter X, Y, and H in mm.</li>
+        <li><strong>Click Generate</strong> — The 3D model will be created.</li>
+        <li><strong>Download STL and slice</strong> — Download the file and open it in your slicer.</li>
+      </ol>
+
+      <p class="howto-note">
+        Main site: 
+        <a href="https://beanbins.xyz">https://beanbins.xyz</a><br>
+        Fallback (GitHub Pages): 
+        <a href="https://queezz.github.io/bin/">https://queezz.github.io/bin/</a>
+      </p>
+      
+      <p class="howto-note">
+        Some managed networks (e.g. universities) may intercept HTTPS traffic and block custom domains.
+        This can trigger browser warnings even for safe sites.
+        The GitHub Pages version is usually not affected and can be used as a fallback.
+      </p>
+      
+      <p class="howto-note">
+        Source code:<br>
+        Frontend: <a href="https://github.com/queezz/bin-generator-frontend" target="_blank">bin-generator-frontend</a><br>
+        Backend: <a href="https://github.com/queezz/bin-generator-server" target="_blank">bin-generator-server</a>
+      </p>
+    </main>
+  </div>
+</body>
+</html>

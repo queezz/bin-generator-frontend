@@ -72,6 +72,38 @@ body {
   line-height: 1.4;
 }
 
+.howto-content {
+  padding: 16px;
+}
+
+.howto-content h1 {
+  margin: 0 0 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.howto-steps {
+  margin: 0 0 24px;
+  padding-left: 1.4em;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.howto-steps li {
+  margin-bottom: 8px;
+}
+
+.howto-note {
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 .controls {
   margin-bottom: 20px;
   padding: 16px;

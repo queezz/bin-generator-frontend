@@ -341,7 +341,23 @@ async function generateAndPreview() {
       return;
     }
 
-    const blob = await generateBin(baseUrl, x, y, h, wall, ears, useRamp);
+    let blob;
+    try {
+      blob = await generateBin(baseUrl, x, y, h, wall, ears, useRamp);
+    } catch (apiError) {
+      console.error(apiError);
+      const isLocal =
+        location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      if (isLocal) {
+        setStatus("Backend not reachable. Did you start the container?", "error");
+      } else {
+        setStatus(
+          "Service temporarily unavailable. Please try again later.",
+          "error"
+        );
+      }
+      return;
+    }
     await setCached(cacheKey, blob);
 
     if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -378,7 +394,10 @@ async function generateAndPreview() {
     setStatus("Model loaded.", "ok");
   } catch (error) {
     console.error(error);
-    setStatus("Failed to load STL. If the API works in browser but not here, enable CORS on the backend.", "error");
+    setStatus(
+      "Failed to load STL. If the API works in browser but not here, enable CORS on the backend.",
+      "error"
+    );
   } finally {
     generateBtn.disabled = false;
   }

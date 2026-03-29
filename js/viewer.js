@@ -12,7 +12,13 @@ const CLOUD_API = "https://bin-generator-540296082924.asia-northeast1.run.app";
 
 function detectBackend() {
   const host = window.location.hostname;
-  if (host === "localhost" || host === "127.0.0.1") {
+  // file:// has empty hostname; use local API so Generate hits your uvicorn, not production.
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "" ||
+    window.location.protocol === "file:"
+  ) {
     return LOCAL_API;
   }
   return CLOUD_API;
@@ -26,7 +32,6 @@ const hEl = document.getElementById("h");
 const wallEl = document.getElementById("wall");
 const earsEl = document.getElementById("ears");
 const useRampEl = document.getElementById("useRamp");
-const textureEl = document.getElementById("texture");
 const generateBtn = document.getElementById("generateBtn");
 const resetViewBtn = document.getElementById("resetViewBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -138,7 +143,7 @@ function snapshotInputs() {
     wall: wallEl.value,
     ears: earsEl.checked,
     ramp: useRampEl?.checked ?? true,
-    texture: textureEl?.checked ?? false,
+    texture: document.getElementById("texture")?.checked ?? false,
   };
 }
 
@@ -186,6 +191,42 @@ async function fetchBackendVersion(baseUrl) {
     return data.version;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Debug (console): texture checkbox, backend local vs cloud, GET /info version.
+ * @param {string} baseUrl
+ * @param {boolean} textureChecked
+ */
+async function logGenerateDebug(baseUrl, textureChecked) {
+  const normalized = baseUrl.replace(/\/+$/, "");
+  const localNorm = LOCAL_API.replace(/\/+$/, "");
+  const cloudNorm = CLOUD_API.replace(/\/+$/, "");
+  let profile;
+  if (normalized === localNorm) {
+    profile = "local (matches LOCAL_API)";
+  } else if (normalized === cloudNorm) {
+    profile = "cloud (matches CLOUD_API)";
+  } else if (/(localhost|127\.0\.0\.1)/.test(normalized)) {
+    profile = "local (custom host/port)";
+  } else {
+    profile = "cloud or custom URL";
+  }
+
+  console.log("[BeanBins] texture checkbox checked:", textureChecked);
+  console.log("[BeanBins] backend baseUrl:", normalized, "|", profile);
+
+  try {
+    const r = await fetch(`${normalized}/info`, { cache: "no-store" });
+    if (!r.ok) {
+      console.log("[BeanBins] GET /info:", r.status, r.statusText);
+      return;
+    }
+    const data = await r.json();
+    console.log("[BeanBins] GET /info →", data);
+  } catch (e) {
+    console.warn("[BeanBins] GET /info error:", e);
   }
 }
 
@@ -288,7 +329,8 @@ function applyParamsToUI(p) {
 
   document.querySelector("#ears").checked = p.ears;
   document.querySelector("#useRamp").checked = p.ramp;
-  document.querySelector("#texture").checked = p.texture ?? false;
+  const texEl = document.querySelector("#texture");
+  if (texEl) texEl.checked = p.texture ?? false;
 }
 
 /**
@@ -548,11 +590,13 @@ async function generateAndPreview() {
   const wall = wallEl.value;
   const ears = earsEl.checked;
   const useRamp = useRampEl?.checked ?? true;
-  const texture = textureEl?.checked ?? false;
+  const texture = document.getElementById("texture")?.checked ?? false;
   const textureTag = texture ? "textured" : "smooth";
   const cacheKey = `bin-${x}-${y}-${h}-w${wall}-ears${ears}-ramp${useRamp}-${textureTag}`;
 
   try {
+    await logGenerateDebug(baseUrl, texture);
+
     let cached = null;
     if (
       sessionBackendVersion != null &&
@@ -562,6 +606,10 @@ async function generateAndPreview() {
     }
     if (token !== renderToken) return;
     if (cached) {
+      console.log(
+        "[BeanBins] IndexedDB cache hit — no /generate fetch. cacheKey:",
+        cacheKey
+      );
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(cached);
       const arrayBuffer = await cached.arrayBuffer();

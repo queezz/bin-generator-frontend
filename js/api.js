@@ -30,7 +30,12 @@ export async function generateBin(
   url.searchParams.set("texture", texture ? "true" : "false");
   url.searchParams.set("name", "true");
 
-  const response = await fetch(url.toString(), { method: "GET" });
+  console.log("[BeanBins] GET /generate full URL:", url.toString());
+
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    cache: "no-store",
+  });
   if (!response.ok) {
     throw new Error("HTTP " + response.status);
   }

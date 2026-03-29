@@ -7,9 +7,19 @@
  * @param {number|string} wall - Wall thickness (mm).
  * @param {boolean} ears - Whether to include ears.
  * @param {boolean} useRamp - Whether to include the ramp/lip.
+ * @param {boolean} texture - Whether to apply wall texture pattern.
  * @returns {Promise<Blob>} STL file blob.
  */
-export async function generateBin(baseUrl, x, y, h, wall, ears, useRamp = true) {
+export async function generateBin(
+  baseUrl,
+  x,
+  y,
+  h,
+  wall,
+  ears,
+  useRamp = true,
+  texture = false
+) {
   const url = new URL(baseUrl.replace(/\/+$/, "") + "/generate");
   url.searchParams.set("x", String(x));
   url.searchParams.set("y", String(y));
@@ -17,6 +27,7 @@ export async function generateBin(baseUrl, x, y, h, wall, ears, useRamp = true) 
   url.searchParams.set("wall", String(wall));
   url.searchParams.set("ears", String(ears));
   url.searchParams.set("use_ramp", String(useRamp));
+  url.searchParams.set("texture", texture ? "true" : "false");
   url.searchParams.set("name", "true");
 
   const response = await fetch(url.toString(), { method: "GET" });

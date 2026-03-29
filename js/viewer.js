@@ -26,6 +26,7 @@ const hEl = document.getElementById("h");
 const wallEl = document.getElementById("wall");
 const earsEl = document.getElementById("ears");
 const useRampEl = document.getElementById("useRamp");
+const textureEl = document.getElementById("texture");
 const generateBtn = document.getElementById("generateBtn");
 const resetViewBtn = document.getElementById("resetViewBtn");
 const downloadBtn = document.getElementById("downloadBtn");
@@ -137,6 +138,7 @@ function snapshotInputs() {
     wall: wallEl.value,
     ears: earsEl.checked,
     ramp: useRampEl?.checked ?? true,
+    texture: textureEl?.checked ?? false,
   };
 }
 
@@ -150,7 +152,8 @@ function userHasModifiedInputs() {
     a.h !== b.h ||
     a.wall !== b.wall ||
     a.ears !== b.ears ||
-    a.ramp !== b.ramp
+    a.ramp !== b.ramp ||
+    a.texture !== b.texture
   );
 }
 
@@ -255,7 +258,7 @@ function parseDemoParams(filename) {
     const name = filename.replace(".stl", "");
 
     const match = name.match(
-      /bin-(\d+)-(\d+)-(\d+)-w([\d.]+)-ears(\d)-ramp(\d)/
+      /bin-(\d+)-(\d+)-(\d+)-w([\d.]+)-ears(\d)-ramp(\d)(?:-(smooth|textured))?/
     );
 
     if (!match) return null;
@@ -267,6 +270,7 @@ function parseDemoParams(filename) {
       wall: parseFloat(match[4]),
       ears: match[5] === "1",
       ramp: match[6] === "1",
+      texture: match[7] === "textured",
     };
   } catch (e) {
     console.warn("Failed to parse demo params", e);
@@ -284,6 +288,7 @@ function applyParamsToUI(p) {
 
   document.querySelector("#ears").checked = p.ears;
   document.querySelector("#useRamp").checked = p.ramp;
+  document.querySelector("#texture").checked = p.texture ?? false;
 }
 
 /**
@@ -543,7 +548,9 @@ async function generateAndPreview() {
   const wall = wallEl.value;
   const ears = earsEl.checked;
   const useRamp = useRampEl?.checked ?? true;
-  const cacheKey = `bin-${x}-${y}-${h}-w${wall}-ears${ears}-ramp${useRamp}`;
+  const texture = textureEl?.checked ?? false;
+  const textureTag = texture ? "textured" : "smooth";
+  const cacheKey = `bin-${x}-${y}-${h}-w${wall}-ears${ears}-ramp${useRamp}-${textureTag}`;
 
   try {
     let cached = null;
@@ -578,6 +585,8 @@ async function generateAndPreview() {
         (ears ? "1" : "0") +
         "-ramp" +
         (useRamp ? "1" : "0") +
+        "-" +
+        textureTag +
         ".stl";
       downloadBtn.classList.remove("disabled");
       saveDimensions(x, y, h, wall);
@@ -591,7 +600,7 @@ async function generateAndPreview() {
 
     let blob;
     try {
-      blob = await generateBin(baseUrl, x, y, h, wall, ears, useRamp);
+      blob = await generateBin(baseUrl, x, y, h, wall, ears, useRamp, texture);
     } catch (apiError) {
       console.error(apiError);
       const isLocal =
@@ -638,6 +647,8 @@ async function generateAndPreview() {
       (ears ? "1" : "0") +
       "-ramp" +
       (useRamp ? "1" : "0") +
+      "-" +
+      textureTag +
       ".stl";
     downloadBtn.classList.remove("disabled");
 

@@ -458,6 +458,10 @@ button:disabled, a.button-link.disabled {
   color: #9aa4b2;
 }
 
+.site-about-source {
+  margin-top: 4px;
+}
+
 .site-footer {
   display: flex;
   justify-content: center;
